@@ -1,0 +1,56 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  bodyClass?: string;
+}
+
+const {
+  title,
+  description = "Black Diamond Custom Tattoos in North Las Vegas — custom work by Joker Ink and Linda G.",
+  bodyClass = ""
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>◆</text></svg>" />
+    <title>{title}</title>
+  </head>
+  <body class={bodyClass}>
+    <div class="staging-banner">Private Headless Staging — the live Black Diamond site is unchanged</div>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Black Diamond Custom Tattoos home">
+        <span class="diamond" aria-hidden="true">◆</span>
+        <span>Black Diamond</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="/joker">Joker</a>
+        <a href="/linda">Linda</a>
+        <a href="/blog">Journal</a>
+        <a href="/integration-status">Integration</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div>
+        <span class="diamond" aria-hidden="true">◆</span>
+        <strong>Black Diamond Custom Tattoos</strong>
+      </div>
+      <p>North Las Vegas · Appointment only · Established Summer 2017</p>
+      <div class="footer-links">
+        <a href="/joker">Joker Ink</a>
+        <a href="/linda">Linda G</a>
+        <a href="/blog">Journal</a>
+      </div>
+    </footer>
+  </body>
+</html>
