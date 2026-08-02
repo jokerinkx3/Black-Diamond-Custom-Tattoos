@@ -1,0 +1,31 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { queryBlogPosts } from "../../lib/blog";
+
+export const prerender = false;
+const posts = await queryBlogPosts(20);
+---
+<SiteLayout title="Black Diamond Tattoo Journal" bodyClass="blog-page">
+  <section class="page-heading section-wrap">
+    <p class="small-label">Black Diamond Journal</p>
+    <h1>Guides for choosing, planning and living with the work.</h1>
+    <p>This staging route reads the existing Wix Blog. Posts continue to be created and edited in the current Wix dashboard.</p>
+  </section>
+
+  <section class="post-grid">
+    {posts.length ? posts.map((post) => (
+      <article class="post-card">
+        {post.coverImageUrl ? <a href={`/post/${post.slug}`}><img src={post.coverImageUrl} alt="" loading="lazy" /></a> : null}
+        <p class="post-date">{post.date}</p>
+        <h2><a href={`/post/${post.slug}`}>{post.title}</a></h2>
+        <p>{post.excerpt}</p>
+        <a class="text-link" href={`/post/${post.slug}`}>Read the guide →</a>
+      </article>
+    )) : (
+      <div class="empty-state">
+        <h2>Blog connection awaiting Wix CLI link.</h2>
+        <p>The live Blog API has already been verified through the Wix connector. This route will populate from the same 11 posts once the staging frontend is linked and running.</p>
+      </div>
+    )}
+  </section>
+</SiteLayout>

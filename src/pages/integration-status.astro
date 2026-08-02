@@ -1,0 +1,39 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import { queryBlogPosts } from "../lib/blog";
+import { jokerForm, lindaForm } from "../data/forms";
+
+export const prerender = false;
+const posts = await queryBlogPosts(1);
+const blogConnected = posts.length > 0;
+---
+<SiteLayout title="Phase 1 Integration Status | Black Diamond" bodyClass="status-page">
+  <section class="page-heading section-wrap">
+    <p class="small-label">Phase 1</p>
+    <h1>Existing Wix business systems remain the backend.</h1>
+    <p>This page is deliberately operational. It confirms each connection without changing the live site.</p>
+  </section>
+
+  <section class="status-list section-wrap">
+    <article>
+      <span class="status-dot status-complete"></span>
+      <div><h2>Existing artist forms mapped</h2><p>Joker: <code>{jokerForm.formId}</code><br />Linda: <code>{lindaForm.formId}</code></p></div>
+    </article>
+    <article>
+      <span class={`status-dot ${blogConnected ? "status-complete" : "status-pending"}`}></span>
+      <div><h2>Existing Wix Blog runtime read</h2><p>{blogConnected ? `Connected. Latest post: “${posts[0].title}”` : "Awaiting the Wix CLI link for the staging frontend. The live Blog API and complete Ricos post body were verified independently through the Wix connector."}</p></div>
+    </article>
+    <article>
+      <span class="status-dot status-complete"></span>
+      <div><h2>Reference uploads excluded</h2><p>The initial inquiry matches the current business process. Reference images are requested later during direct contact.</p></div>
+    </article>
+    <article>
+      <span class="status-dot status-pending"></span>
+      <div><h2>Controlled form submissions</h2><p>Not run yet. The final Phase 1 proof will submit one clearly labeled test inquiry through each existing form, then verify contact creation, automations and thank-you routing before deleting the test records.</p></div>
+    </article>
+    <article>
+      <span class="status-dot status-complete"></span>
+      <div><h2>Production site protected</h2><p>The live domain and classic Wix pages remain unchanged. A full pre-overhaul duplicate also exists.</p></div>
+    </article>
+  </section>
+</SiteLayout>

@@ -1,0 +1,28 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import RicosContent from "../../components/RicosContent";
+import { getBlogPostBySlug } from "../../lib/blog";
+
+export const prerender = false;
+const slug = Astro.params.slug ?? "";
+const post = await getBlogPostBySlug(slug);
+if (!post) Astro.response.status = 404;
+---
+<SiteLayout title={post ? `${post.title} | Black Diamond` : "Post not found | Black Diamond"} bodyClass="post-page">
+  {post ? (
+    <article class="post-detail">
+      <header>
+        <p class="post-date">{post.date}</p>
+        <h1>{post.title}</h1>
+        {post.excerpt ? <p class="post-excerpt">{post.excerpt}</p> : null}
+        {post.coverImageUrl ? <img class="post-hero-image" src={post.coverImageUrl} alt="" /> : null}
+      </header>
+      <RicosContent client:only="react" content={post.richContent} />
+    </article>
+  ) : (
+    <section class="empty-state section-wrap">
+      <h1>That article could not be found.</h1>
+      <a class="text-link" href="/blog">Return to the journal →</a>
+    </section>
+  )}
+</SiteLayout>
