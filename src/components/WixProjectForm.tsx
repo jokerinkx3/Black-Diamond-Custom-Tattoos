@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { getExistingBdctClient } from "../lib/bdct-client";
+import { existingBdctClient } from "../lib/bdct-client";
 import type { ArtistFormManifest, FormField, FormValue } from "../data/forms";
 
 function inputValue(value: FormValue | undefined): string {
@@ -48,8 +48,7 @@ export default function WixProjectForm({ manifest }: { manifest: ArtistFormManif
     setStatus("submitting");
 
     try {
-      const client = getExistingBdctClient();
-      const result = await client.submissions.createSubmission({
+      const result = await existingBdctClient.submissions.createSubmission({
         formId: manifest.formId,
         submissions: values
       });

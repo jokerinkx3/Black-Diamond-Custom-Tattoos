@@ -1,5 +1,5 @@
 import { media } from "@wix/sdk";
-import { getExistingBdctClient } from "./bdct-client";
+import { existingBdctClient } from "./bdct-client";
 
 export type BlogPostView = {
   id: string;
@@ -38,8 +38,7 @@ function normalizePost(item: any): BlogPostView {
 
 export async function queryBlogPosts(limit = 12): Promise<BlogPostView[]> {
   try {
-    const client = getExistingBdctClient();
-    const response = await client.posts
+    const response = await existingBdctClient.posts
       .queryPosts({ fieldsets: ["RICH_CONTENT", "CONTENT_TEXT", "URL"] })
       .descending("firstPublishedDate")
       .limit(limit)
@@ -54,8 +53,7 @@ export async function queryBlogPosts(limit = 12): Promise<BlogPostView[]> {
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPostView | null> {
   try {
-    const client = getExistingBdctClient();
-    const response = await client.posts
+    const response = await existingBdctClient.posts
       .queryPosts({ fieldsets: ["RICH_CONTENT", "CONTENT_TEXT", "URL"] })
       .eq("slug", slug)
       .limit(1)
