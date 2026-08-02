@@ -19,8 +19,8 @@
     "@wix/ricos": "latest",
     "@wix/sdk": "latest",
     "astro": "^5.13.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
