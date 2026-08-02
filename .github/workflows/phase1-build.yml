@@ -1,0 +1,36 @@
+name: Phase 1 Headless Build
+
+on:
+  push:
+    branches:
+      - phase-1-headless-staging
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      PUBLIC_BDCT_OAUTH_CLIENT_ID: 028b2fc1-4180-4c49-92f5-9a62b1c96a2d
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.11.1"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - name: Type-check Astro project
+        run: npm run check
+
+      - name: Build Wix-hosted Astro output
+        run: npm run build:astro
