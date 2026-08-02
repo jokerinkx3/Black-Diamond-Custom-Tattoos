@@ -1,4 +1,4 @@
-name: Phase 1 Headless Build
+name: Phase 1 Headless Build and Deploy
 
 on:
   push:
@@ -11,12 +11,18 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: bdct-headless-staging
+  cancel-in-progress: true
+
+env:
+  PUBLIC_BDCT_OAUTH_CLIENT_ID: 028b2fc1-4180-4c49-92f5-9a62b1c96a2d
+  WIX_CLIENT_ID: 70d88af5-972d-4f5a-8d78-6acdd7f8ab53
+  STAGING_URL: https://h6s-92e874502bd0c4-bdcustomtattoos.wix-site-host.com
+
 jobs:
   validate:
     runs-on: ubuntu-latest
-    env:
-      PUBLIC_BDCT_OAUTH_CLIENT_ID: 028b2fc1-4180-4c49-92f5-9a62b1c96a2d
-      WIX_CLIENT_ID: 70d88af5-972d-4f5a-8d78-6acdd7f8ab53
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -27,10 +33,79 @@ jobs:
           node-version: "22"
 
       - name: Install dependencies
-        run: npm install --ignore-scripts
+        run: npm install --ignore-scripts --legacy-peer-deps
 
       - name: Type-check Astro project
         run: npm run check
 
       - name: Build Wix-hosted Astro output
         run: npm run build:astro
+
+  deploy-staging:
+    needs: validate
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      WIX_CLI_API_KEY: ${{ secrets.WIX_CLI_API_KEY }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Verify Wix deployment credential
+        run: |
+          if [ -z "$WIX_CLI_API_KEY" ]; then
+            echo "::error::Repository secret WIX_CLI_API_KEY is not configured. Generate a Wix API key with the Wix CLI - Git Integration permission and save it under that exact GitHub secret name."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts --legacy-peer-deps
+
+      - name: Authenticate Wix CLI
+        run: npm run wix login -- --api-key "$WIX_CLI_API_KEY"
+
+      - name: Pull Wix-managed runtime environment
+        run: npx @wix/cli@latest env pull --json
+
+      - name: Build through Wix CLI
+        run: CI=1 npm run build
+
+      - name: Release to Wix staging hosting
+        run: CI=1 npm run release
+
+      - name: Verify deployed routes and approved staging copy
+        run: |
+          set -euo pipefail
+          fetch() {
+            local path="$1"
+            local output="$2"
+            curl --fail --silent --show-error --location \
+              --retry 8 --retry-delay 5 --retry-all-errors \
+              "$STAGING_URL$path" -o "$output"
+          }
+
+          fetch "/" /tmp/home.html
+          fetch "/joker" /tmp/joker.html
+          fetch "/linda" /tmp/linda.html
+          fetch "/integration-status" /tmp/integration.html
+          fetch "/blog" /tmp/blog.html
+          fetch "/post/black-and-grey-realism-tattoos-las-vegas" /tmp/post.html
+
+          grep -F "Two unmistakable artists. One place to find them." /tmp/home.html
+          grep -F "Your tattoo should enter the room before you do." /tmp/joker.html
+          grep -F "The old tattoo does not get the final word." /tmp/linda.html
+          grep -F "Existing Wix business systems remain the backend." /tmp/integration.html
+          grep -F "Black &amp; Grey Realism Tattoos in Las Vegas" /tmp/post.html || \
+            grep -F "Black & Grey Realism Tattoos in Las Vegas" /tmp/post.html
+
+          if grep -Eqi 'reference.{0,20}(image|photo).{0,20}(upload|attach)|type=["'"']file["'"']' /tmp/joker.html /tmp/linda.html; then
+            echo "::error::An initial-inquiry reference upload field was detected."
+            exit 1
+          fi
+
+          echo "All read-only Phase 1 staging routes passed."
