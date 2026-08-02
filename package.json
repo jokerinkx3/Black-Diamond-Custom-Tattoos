@@ -1,0 +1,29 @@
+{
+  "name": "bdct-headless-staging",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "check": "astro check",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/react": "^4.3.0",
+    "@astrojs/sitemap": "^3.4.1",
+    "@wix/astro": "latest",
+    "@wix/astro-pages": "latest",
+    "@wix/blog": "latest",
+    "@wix/forms": "latest",
+    "@wix/ricos": "latest",
+    "@wix/sdk": "latest",
+    "astro": "^5.13.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.8.0"
+  }
+}
